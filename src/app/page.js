@@ -1,64 +1,87 @@
 // src/app/page.js
 import Link from 'next/link';
-import Header from '@/components/Header'; // استيراد الهيدر
-import Footer from '@/components/Footer'; // استيراد الفوتر
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
-// Placeholder icons...
-const IconStethoscope = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2a.3.3 0 0 0-.2.3V10a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V4H4.8z"/><path d="M8 12v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-1"/><circle cx="12" cy="12" r="10"/><path d="m16.2 7.8 1.4-1.4"/><path d="m21.5 12.5-1.4-1.4"/><path d="m16.2 16.2 1.4 1.4"/></svg>;
-const IconBrainCircuit = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a2.5 2.5 0 0 1 3 4.85"/><path d="M12 2a2.5 2.5 0 0 0-3 4.85"/><path d="M12 11.15a2.5 2.5 0 0 1 3 4.85"/><path d="M12 11.15a2.5 2.5 0 0 0-3 4.85"/><path d="M12 22a2.5 2.5 0 0 1 3-4.85"/><path d="M12 22a2.5 2.5 0 0 0-3-4.85"/><path d="M15 6.85a2.5 2.5 0 0 1 4.33-2.5"/><path d="M19.33 4.35a2.5 2.5 0 0 1 2.5 4.33"/><path d="M21.83 8.68a2.5 2.5 0 0 1 0 5.66"/><path d="M21.83 15.32a2.5 2.5 0 0 1-2.5 4.33"/><path d="M19.33 19.65a2.5 2.5 0 0 1-4.33 2.5"/><path d="M15 17.15a2.5 2.5 0 0 1-4.33 2.5"/><path d="M9 17.15a2.5 2.5 0 0 1-4.33-2.5"/><path d="M4.67 19.65a2.5 2.5 0 0 1-2.5-4.33"/><path d="M2.17 15.32a2.5 2.5 0 0 1 0-5.66"/><path d="M2.17 8.68a2.5 2.5 0 0 1 2.5-4.33"/><path d="M4.67 4.35a2.5 2.5 0 0 1 4.33-2.5"/><path d="M9 6.85a2.5 2.5 0 0 1 4.33 2.5"/></svg>;
-const IconUsers = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-
+// Placeholder icons from Heroicons (SVG code)
+const BeakerIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082M19 14.5v-2.121c0-.623-.32-1.206-.862-1.581L14.25 8.192M19 14.5H5a2.25 2.25 0 00-2.25 2.25v1.125c0 1.242 1.008 2.25 2.25 2.25h14.5a2.25 2.25 0 002.25-2.25v-1.125a2.25 2.25 0 00-2.25-2.25z" />
+  </svg>
+);
+const BookOpenIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6-2.292m0 0v14.25" />
+  </svg>
+);
+const TrophyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9a9.75 9.75 0 011.316-5.033l.24-1.202a5.25 5.25 0 019.848 0l.24 1.202A9.75 9.75 0 0116.5 18.75zM12 12.75V3" />
+  </svg>
+);
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-blue-50 font-sans">
+    <div>
       <Header />
 
-      {/* ===== Main Hero Section ===== */}
-      <main className="w-full max-w-7xl mx-auto px-6 py-20 md:py-28 text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-gray-800">
-          The Arena for Future Clinicians
-        </h1>
-        <p className="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-          Sharpen your diagnostic skills, compete with peers, and master clinical knowledge on a platform built for medical excellence.
-        </p>
-        
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Link href="#" className="pro-card block bg-white rounded-xl shadow-md p-8 text-left">
-            <h3 className="text-2xl font-bold text-blue-600 mb-2">Start Challenges</h3>
-            <p className="text-gray-600">Engage in timed contests and solve complex clinical cases under pressure.</p>
-          </Link>
-          <Link href="#" className="pro-card block bg-white rounded-xl shadow-md p-8 text-left">
-            <h3 className="text-2xl font-bold text-blue-600 mb-2">Browse Questions</h3>
-            <p className="text-gray-600">Access a vast question bank covering all medical specialties to practice at your own pace.</p>
-          </Link>
-          <Link href="#" className="pro-card block bg-white rounded-xl shadow-md p-8 text-left">
-            <h3 className="text-2xl font-bold text-blue-600 mb-2">View Leaderboard</h3>
-            <p className="text-gray-600">Track your progress, compare your rank, and see how you stack up against the best.</p>
-          </Link>
+      {/* Hero Section */}
+      <main className="hero-bg py-20 px-6 text-center">
+        <div className="container mx-auto">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">
+            The Competitive Edge for Medical Students
+          </h1>
+          <p className="mt-4 text-lg text-gray-700 max-w-2xl mx-auto">
+            Hone your clinical skills, challenge your peers, and climb the ranks on a platform built for the next generation of medical leaders.
+          </p>
+          <div className="mt-8 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+            <Link href="/challenges" className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+              Start Challenges
+            </Link>
+            <Link href="/questions" className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">
+              Browse Questions
+            </Link>
+            <Link href="/leaderboard" className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">
+              View Leaderboard
+            </Link>
+          </div>
         </div>
       </main>
 
-      {/* ===== Why MedForces Section ===== */}
-      <section className="bg-white w-full py-20 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Why MedForces?</h2>
-          <p className="text-lg text-gray-600 mb-12">A platform designed to bridge theory and practice.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="feature-item p-6 rounded-lg">
-                <div className="flex justify-center items-center h-16 w-16 bg-blue-100 text-blue-600 rounded-full mx-auto mb-4"><IconStethoscope /></div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Competitive Challenges</h3>
-                <p className="text-gray-600">Simulate real-world clinical scenarios to boost your decision-making skills.</p>
+      {/* Why MedForces Section */}
+      <section className="bg-white py-20 px-6">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl font-bold text-blue-800">Why MedForces?</h2>
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="bg-gray-50 p-8 rounded-lg shadow-md">
+              <div className="flex justify-center items-center mb-4">
+                <div className="bg-emerald-100 p-3 rounded-full">
+                  <BeakerIcon />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Competitive Challenges</h3>
+              <p className="text-gray-600">Put your knowledge to the test with real-world clinical cases and timed quizzes.</p>
             </div>
-            <div className="feature-item p-6 rounded-lg">
-                <div className="flex justify-center items-center h-16 w-16 bg-blue-100 text-blue-600 rounded-full mx-auto mb-4"><IconBrainCircuit /></div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Interactive Learning</h3>
-                <p className="text-gray-600">Practice thousands of MCQs with detailed explanations to learn effectively.</p>
+            {/* Card 2 */}
+            <div className="bg-gray-50 p-8 rounded-lg shadow-md">
+              <div className="flex justify-center items-center mb-4">
+                <div className="bg-emerald-100 p-3 rounded-full">
+                  <BookOpenIcon />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Interactive Questions</h3>
+              <p className="text-gray-600">Practice thousands of MCQs with detailed explanations to learn effectively.</p>
             </div>
-            <div className="feature-item p-6 rounded-lg">
-                <div className="flex justify-center items-center h-16 w-16 bg-blue-100 text-blue-600 rounded-full mx-auto mb-4"><IconUsers /></div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Thriving Community</h3>
-                <p className="text-gray-600">Connect with peers, share knowledge, and grow together in a supportive environment.</p>
+            {/* Card 3 */}
+            <div className="bg-gray-50 p-8 rounded-lg shadow-md">
+              <div className="flex justify-center items-center mb-4">
+                <div className="bg-emerald-100 p-3 rounded-full">
+                  <TrophyIcon />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Community Leaderboard</h3>
+              <p className="text-gray-600">Connect with peers, track your progress, and climb the ranks.</p>
             </div>
           </div>
         </div>
