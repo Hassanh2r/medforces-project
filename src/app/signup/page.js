@@ -6,35 +6,28 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient'; // استيراد العميل للتواصل مع Supabase
 
 export default function SignupPage() {
-  // استخدام الحالة لتخزين مدخلات المستخدم
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [message, setMessage] = useState(''); // لعرض رسائل النجاح أو الخطأ
+  const [message, setMessage] = useState('');
 
-  // دالة يتم استدعاؤها عند إرسال النموذج
   const handleSignUp = async (event) => {
-    event.preventDefault(); // منع إعادة تحميل الصفحة
-    setMessage(''); // مسح أي رسالة قديمة
+    event.preventDefault();
+    setMessage('');
 
     const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
+      email,
+      password,
       options: {
-        // يمكننا هنا إضافة بيانات إضافية للمستخدم مثل الاسم
-        data: {
-          full_name: fullName,
-        }
-      }
+        data: { full_name: fullName },
+        emailRedirectTo: `${window.location.origin}/auth/callback`, // رابط التأكيد
+      },
     });
 
     if (error) {
-      // في حالة وجود خطأ، قم بعرضه
       setMessage(`Error: ${error.message}`);
-    } else if (data.user) {
-      // في حالة النجاح
-      setMessage('Account created successfully! Please check your email to verify.');
-      // إفراغ الحقول بعد النجاح
+    } else {
+      setMessage("Account created! Please check your email to confirm before logging in.");
       setEmail('');
       setPassword('');
       setFullName('');
@@ -53,7 +46,6 @@ export default function SignupPage() {
           </p>
         </div>
         
-        {/* ربط النموذج بدالة handleSignUp */}
         <form className="space-y-6" onSubmit={handleSignUp}>
           <div>
             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
@@ -64,8 +56,8 @@ export default function SignupPage() {
                 id="fullName"
                 name="fullName"
                 type="text"
-                value={fullName} // ربط القيمة بالحالة
-                onChange={(e) => setFullName(e.target.value)} // تحديث الحالة عند الكتابة
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
@@ -116,7 +108,6 @@ export default function SignupPage() {
           </div>
         </form>
 
-        {/* عرض رسالة الحالة هنا */}
         {message && (
           <p className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-md border border-green-200">
             {message}

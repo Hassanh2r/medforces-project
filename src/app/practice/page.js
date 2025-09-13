@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';  // 👈 مهم علشان التوجيه
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
@@ -28,7 +29,10 @@ const shuffleArray = (array) => {
 };
 
 export default function PracticePage() {
+  const router = useRouter(); // 👈 للـ redirect
   const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true); // 👈 علشان نمنع وميض الصفحة
+
   const [modules, setModules] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [lectures, setLectures] = useState([]);
@@ -47,15 +51,21 @@ export default function PracticePage() {
   const [score, setScore] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
 
+  // 👇 حماية تسجيل الدخول
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      const { data: modulesData } = await supabase.from('modules').select('*').order('name');
-      setModules(modulesData || []);
+      if (!user) {
+        router.push("/login"); // 👈 لو مش عامل لوجين يرجعه
+      } else {
+        setUser(user);
+        const { data: modulesData } = await supabase.from('modules').select('*').order('name');
+        setModules(modulesData || []);
+      }
+      setLoadingUser(false);
     };
-    fetchInitialData();
-  }, []);
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     if (!selectedModule) {
@@ -188,6 +198,14 @@ export default function PracticePage() {
 
   const currentQuestion = quizActive ? questions[currentQuestionIndex] : null;
   const progress = quizActive ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <p className="text-gray-600">Checking authentication...</p>
+      </div>
+    );
+  }
 
   const SelectionUI = () => (
     <div className="max-w-4xl mx-auto space-y-10">
