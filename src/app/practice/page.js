@@ -194,7 +194,7 @@ export default function PracticePage() {
       {user && (
         <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 text-center">
           <h2 className="text-2xl font-bold text-yellow-800 mb-2">Personalized Practice</h2>
-          <p className="text-yellow-700 mb-4">Focus on questions you've answered incorrectly to improve your weak points.</p>
+          <p className="text-yellow-700 mb-4">Focus on questions you&apos;ve answered incorrectly to improve your weak points.</p>
           <button
             onClick={handleStartWeaknessPractice}
             className="px-8 py-3 bg-yellow-400 text-yellow-900 font-bold rounded-lg shadow-md hover:bg-yellow-500 transition-transform transform hover:scale-105"
