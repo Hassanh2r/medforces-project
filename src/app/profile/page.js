@@ -114,7 +114,7 @@ export default function ProfilePage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-600 text-center py-10">You haven't completed any challenges yet.</p>
+              <p className="text-gray-600 text-center py-10"><p>You haven&apos;t completed any challenges yet.</p>
             )}
           </div>
         </div>
