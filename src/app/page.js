@@ -38,7 +38,7 @@ export default function Home() {
             <Link href="/challenges" className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
               Start Challenges
             </Link>
-            <Link href="/questions" className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">
+            <Link href="/practice" className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">
               Browse Questions
             </Link>
             <Link href="/leaderboard" className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300">

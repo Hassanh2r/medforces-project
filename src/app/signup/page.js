@@ -1,31 +1,43 @@
-// src/app/login/page.js
+// src/app/signup/page.js
 "use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // لاستخدامه في توجيه المستخدم
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient'; // استيراد العميل للتواصل مع Supabase
 
-export default function LoginPage() {
-  const router = useRouter(); // تهيئة الـ router
+export default function SignupPage() {
+  // استخدام الحالة لتخزين مدخلات المستخدم
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [message, setMessage] = useState(''); // لعرض رسائل النجاح أو الخطأ
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setMessage('');
+  // دالة يتم استدعاؤها عند إرسال النموذج
+  const handleSignUp = async (event) => {
+    event.preventDefault(); // منع إعادة تحميل الصفحة
+    setMessage(''); // مسح أي رسالة قديمة
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
+      options: {
+        // يمكننا هنا إضافة بيانات إضافية للمستخدم مثل الاسم
+        data: {
+          full_name: fullName,
+        }
+      }
     });
 
     if (error) {
+      // في حالة وجود خطأ، قم بعرضه
       setMessage(`Error: ${error.message}`);
-    } else {
-      // في حالة نجاح تسجيل الدخول، قم بتوجيه المستخدم للصفحة الرئيسية
-      router.push('/');
+    } else if (data.user) {
+      // في حالة النجاح
+      setMessage('Account created successfully! Please check your email to verify.');
+      // إفراغ الحقول بعد النجاح
+      setEmail('');
+      setPassword('');
+      setFullName('');
     }
   };
 
@@ -34,14 +46,32 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-lg rounded-xl">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">
-            Login to MedForces
+            Create a New Account
           </h1>
           <p className="mt-2 text-gray-600">
-            Welcome back, future clinician!
+            Join the MedForces community today!
           </p>
         </div>
         
-        <form className="space-y-6" onSubmit={handleLogin}>
+        {/* ربط النموذج بدالة handleSignUp */}
+        <form className="space-y-6" onSubmit={handleSignUp}>
+          <div>
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
+            <div className="mt-1">
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                value={fullName} // ربط القيمة بالحالة
+                onChange={(e) => setFullName(e.target.value)} // تحديث الحالة عند الكتابة
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+          
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email address
@@ -81,22 +111,22 @@ export default function LoginPage() {
               type="submit"
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Login
+              Sign Up
             </button>
           </div>
         </form>
 
-        {/* عرض رسائل الخطأ فقط */}
+        {/* عرض رسالة الحالة هنا */}
         {message && (
-          <p className="text-center text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+          <p className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-md border border-green-200">
             {message}
           </p>
         )}
 
         <p className="text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-            Sign up
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            Login
           </Link>
         </p>
       </div>
