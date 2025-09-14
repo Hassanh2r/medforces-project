@@ -1,55 +1,78 @@
 @import "tailwindcss";
 
+/* ============ Root Variables ============ */
 :root {
-  --background: #ffffff;
-  --foreground: #000000; /* ← غيّرت اللون لأسود صريح */
-}
+  --background: #ffffff;   /* Light mode background */
+  --foreground: #000000;   /* Light mode text (black) */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --muted-foreground: #6b7280; /* Gray 500 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ffffff; /* أبيض واضح بدل الرمادي */
+    --background: #0a0a0a;   /* Dark mode background */
+    --foreground: #ffffff;   /* Dark mode text (white) */
+
+    --muted-foreground: #9ca3af; /* Gray 400 */
   }
 }
 
+/* ============ Tailwind Theme Binding ============ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
+}
+
+/* ============ Base Styles ============ */
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground, #000000); /* fallback = black */
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom Styles for MedForces Professional Theme */
+/* ========= Utility Helpers ========= */
+.text-default {
+  color: var(--foreground, #000000);
+}
 
+.text-muted {
+  color: var(--muted-foreground, #6b7280);
+}
+
+.bg-default {
+  background-color: var(--background, #ffffff);
+}
+
+/* ========= Custom Styles for MedForces ========= */
+
+/* Light blue global background */
 body {
-  background-color: #f0f9ff; /* Light blue background */
+  background-color: #f0f9ff;
 }
 
-/* Style for the main action cards */
+/* Main action cards */
 .pro-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .pro-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(66, 153, 225, 0.2);
 }
 
-/* Style for the 'Why MedForces' feature items */
+/* Why MedForces feature items */
 .feature-item {
   transition: background-color 0.3s ease;
 }
-
 .feature-item:hover {
   background-color: #ffffff;
 }
 
+/* Hero background */
 .hero-bg {
   background-image: linear-gradient(135deg, #e0f7fa 0%, #f1f5f9 100%);
 }
