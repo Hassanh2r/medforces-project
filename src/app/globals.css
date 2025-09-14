@@ -1,65 +1,55 @@
 @import "tailwindcss";
 
-/* ============ Root Variables ============ */
 :root {
-  --background: #ffffff;   /* Light mode background */
-  --foreground: #171717;   /* Light mode text (black) */
+  --background: #ffffff;
+  --foreground: #171717;
+}
 
-  --muted-foreground: #6b7280; /* Gray 500 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;   /* Dark mode background */
-    --foreground: #ededed;   /* Dark mode text (white) */
-
-    --muted-foreground: #9ca3af; /* Gray 400 */
+    --background: #0a0a0a;
+    --foreground: #ededed;
   }
 }
 
-/* ============ Tailwind Theme Binding ============ */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
-  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
-}
-
-/* ============ Base Styles ============ */
 body {
   background: var(--background);
-  color: var(--foreground, #000000); /* fallback = black */
-  font-family: var(--font-sans);
-  margin: 0;
-  padding: 0;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ========= Custom Styles for MedForces ========= */
+/* Custom Styles for MedForces Professional Theme */
 
-/* Light blue global background */
 body {
-  background-color: #f0f9ff;
+  background-color: #f0f9ff; /* Light blue background */
 }
 
-/* Main action cards */
+/* Style for the main action cards */
 .pro-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .pro-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(66, 153, 225, 0.2);
 }
 
-/* Why MedForces feature items */
+/* Style for the 'Why MedForces' feature items */
 .feature-item {
   transition: background-color 0.3s ease;
 }
+
 .feature-item:hover {
   background-color: #ffffff;
 }
 
-/* Hero background */
 .hero-bg {
   background-image: linear-gradient(135deg, #e0f7fa 0%, #f1f5f9 100%);
 }

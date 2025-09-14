@@ -202,7 +202,7 @@ export default function PracticePage() {
   if (loadingUser) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <p className="text-gray-600">Checking authentication...</p>
+        <p className="text-gray-800">Checking authentication...</p>
       </div>
     );
   }
@@ -225,17 +225,17 @@ export default function PracticePage() {
 
       <div className="relative">
         <hr />
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-50 px-4 text-gray-500 font-semibold">OR</div>
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-50 px-4 text-gray-800 font-semibold">OR</div>
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-gray-700 mb-1">Standard Practice</h2>
-        <p className="text-gray-500 mb-4">Select from the options below to start a standard session.</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-1">Standard Practice</h2>
+        <p className="text-gray-700 mb-4">Select from the options below to start a standard session.</p>
         <div className="space-y-6">
 
           {/* Step 1 */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Step 1: Select a Module</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Step 1: Select a Module</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {modules.map(m => (
                 <button
@@ -252,7 +252,7 @@ export default function PracticePage() {
           {/* Step 2 */}
           {selectedModule && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Step 2: Select a Subject</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Step 2: Select a Subject</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subjects.map(s => (
                   <button
@@ -270,7 +270,7 @@ export default function PracticePage() {
           {/* Step 3 */}
           {selectedSubject && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Step 3: Select a Lecture</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Step 3: Select a Lecture</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {lectures.map(l => (
                   <button
@@ -288,13 +288,13 @@ export default function PracticePage() {
           {/* Step 4 */}
           {selectedLecture && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Step 4: Choose Question Count</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Step 4: Choose Question Count</h3>
               <div className="flex flex-wrap gap-4">
                 {[10, 20, 'all'].map(limit => (
                   <button
                     key={limit}
                     onClick={() => setQuestionLimit(limit)}
-                    className={`px-5 py-2 rounded-lg font-semibold transition-colors ${questionLimit === limit ? 'bg-blue-600 text-white' : 'bg-white hover:bg-blue-50 border'}`}
+                    className={`px-5 py-2 rounded-lg font-semibold text-gray-800 transition-colors ${questionLimit === limit ? 'bg-blue-600 text-white' : 'bg-white hover:bg-blue-50 border'}`}
                   >
                     {limit === 'all' ? 'All' : limit} Questions
                   </button>
@@ -306,13 +306,13 @@ export default function PracticePage() {
           {/* Step 5 */}
           {selectedLecture && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Step 5: Choose Mode</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Step 5: Choose Mode</h3>
               <div className="flex flex-wrap gap-4">
                 {['study', 'exam'].map(mode => (
                   <button
                     key={mode}
                     onClick={() => setQuizMode(mode)}
-                    className={`px-5 py-2 rounded-lg font-semibold transition-colors capitalize ${quizMode === mode ? 'bg-blue-600 text-white' : 'bg-white hover:bg-blue-50 border'}`}
+                    className={`px-5 py-2 rounded-lg font-semibold text-gray-800 transition-colors capitalize ${quizMode === mode ? 'bg-blue-600 text-white' : 'bg-white hover:bg-blue-50 border'}`}
                   >
                     {mode} Mode
                   </button>
@@ -341,7 +341,7 @@ export default function PracticePage() {
   const ResultsUI = () => (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg text-center">
       <h2 className="text-3xl font-bold text-blue-800 mb-4">Practice Complete!</h2>
-      <p className="text-xl text-gray-700 mb-8">Your final score: <span className="font-bold text-green-600">{score}</span> out of {questions.length}</p>
+      <p className="text-xl text-gray-800 mb-8">Your final score: <span className="font-bold text-green-600">{score}</span> out of {questions.length}</p>
       {quizMode === 'exam' && (
         <div className="space-y-6 text-left mb-8">
           <h3 className="text-2xl font-bold text-gray-800 text-center">Review Your Answers</h3>
@@ -351,9 +351,9 @@ export default function PracticePage() {
             return (
               <div key={q.id} className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                 <p className="font-semibold text-gray-800 mb-2">{index + 1}. {q.question_text}</p>
-                <p className="text-sm text-gray-600">Your answer: <span className={!isCorrect ? 'font-bold text-red-700' : ''}>{q.options[userAnswerIndex] || "No answer"}</span></p>
-                {!isCorrect && <p className="text-sm text-gray-600">Correct answer: <span className="font-bold text-green-700">{q.options[q.correct_answer_index]}</span></p>}
-                <p className="mt-2 text-sm text-gray-500 border-t pt-2">Explanation: {q.explanation}</p>
+                <p className="text-sm text-gray-800">Your answer: <span className={!isCorrect ? 'font-bold text-red-700' : ''}>{q.options[userAnswerIndex] || "No answer"}</span></p>
+                {!isCorrect && <p className="text-sm text-gray-800">Correct answer: <span className="font-bold text-green-700">{q.options[q.correct_answer_index]}</span></p>}
+                <p className="mt-2 text-sm text-gray-700 border-t pt-2">Explanation: {q.explanation}</p>
               </div>
             )
           })}
@@ -372,7 +372,7 @@ export default function PracticePage() {
       <main className="flex-grow container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-800">Practice Question Bank</h1>
-          <p className="mt-2 text-lg text-gray-600">Enhance your knowledge one question at a time.</p>
+          <p className="mt-2 text-lg text-gray-700">Enhance your knowledge one question at a time.</p>
         </div>
         {!quizActive && !quizCompleted && <SelectionUI />}
         {quizActive && currentQuestion && (
@@ -386,37 +386,31 @@ export default function PracticePage() {
                 <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
               </div>
             </div>
-            <p className="text-lg font-medium text-gray-800 mb-6">{currentQuestion.question_text}</p>
+            <h2 className="text-xl font-semibold mb-6 text-gray-800">{currentQuestion.question_text}</h2>
             <div className="space-y-4">
               {currentQuestion.options.map((option, index) => {
-                const isCorrect = index === currentQuestion.correct_answer_index;
                 const isSelected = selectedAnswer === index;
-                let feedbackClass = '';
-                if (showFeedback) {
-                  if (isCorrect) feedbackClass = 'bg-green-100 border-green-500 ring-2 ring-green-500';
-                  else if (isSelected) feedbackClass = 'bg-red-100 border-red-500 ring-2 ring-red-500';
-                }
+                const isCorrect = index === currentQuestion.correct_answer_index;
                 return (
                   <button
                     key={index}
                     onClick={() => handleAnswer(index)}
-                    disabled={selectedAnswer !== null}
-                    className={`w-full p-4 text-left rounded-lg border-2 text-gray-800 transition-colors duration-200 flex items-center justify-between ${isSelected ? 'border-blue-600 ring-2 ring-blue-600' : 'bg-white hover:border-blue-400'} ${feedbackClass}`}
+                    className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${isSelected ? (isCorrect ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500') : 'bg-white hover:bg-gray-50 border-gray-300'}`}
                   >
-                    <span>{option}</span>
-                    {showFeedback && (isCorrect ? <CheckIcon /> : (isSelected ? <XIcon /> : null))}
+                    <span className="text-gray-800">{option}</span>
                   </button>
-                );
+                )
               })}
             </div>
-            {showFeedback && (
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg border">
-                <p className="text-sm text-gray-700"><span className="font-semibold">Explanation:</span> {currentQuestion.explanation}</p>
-              </div>
-            )}
-            {selectedAnswer !== null && (
-              <div className="mt-6 flex justify-end">
-                <button onClick={() => handleNextQuestion(true)} className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700">Next</button>
+            {quizMode === 'study' && showFeedback && (
+              <div className="mt-6 p-4 rounded-lg border bg-gray-50 text-gray-800">
+                {selectedAnswer === currentQuestion.correct_answer_index ? (
+                  <p className="flex items-center gap-2 font-semibold text-green-700"><CheckIcon /> Correct!</p>
+                ) : (
+                  <p className="flex items-center gap-2 font-semibold text-red-700"><XIcon /> Incorrect. Correct answer: <span className="font-bold text-green-700">{currentQuestion.options[currentQuestion.correct_answer_index]}</span></p>
+                )}
+                <p className="mt-2 text-sm text-gray-700">Explanation: {currentQuestion.explanation}</p>
+                <button onClick={() => handleNextQuestion()} className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700">Next</button>
               </div>
             )}
           </div>
