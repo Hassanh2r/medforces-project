@@ -401,7 +401,7 @@ export default function PracticePage() {
                     key={index}
                     onClick={() => handleAnswer(index)}
                     disabled={selectedAnswer !== null}
-                    className={`w-full p-4 text-left rounded-lg border-2 transition-colors duration-200 flex items-center justify-between ${isSelected ? 'border-blue-600 ring-2 ring-blue-600' : 'bg-white hover:border-blue-400'} ${feedbackClass}`}
+                    className={`w-full p-4 text-left rounded-lg border-2 text-gray-800 transition-colors duration-200 flex items-center justify-between ${isSelected ? 'border-blue-600 ring-2 ring-blue-600' : 'bg-white hover:border-blue-400'} ${feedbackClass}`}
                   >
                     <span>{option}</span>
                     {showFeedback && (isCorrect ? <CheckIcon /> : (isSelected ? <XIcon /> : null))}

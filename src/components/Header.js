@@ -6,16 +6,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
-// Helper: get rank color
-function getRankColor(rating) {
+// دالة لتحديد لون التقييم
+const getRankColor = (rating) => {
   if (!rating) return "text-gray-700";
-  if (rating < 1200) return "text-gray-600";    // Newbie
-  if (rating < 1400) return "text-green-600";    // Pupil
-  if (rating < 1600) return "text-cyan-600";     // Specialist
-  if (rating < 1900) return "text-blue-600";     // Expert
-  if (rating < 2100) return "text-purple-600";   // Candidate Master
-  return "text-orange-500";                     // Master & above
-}
+  if (rating < 1200) return "text-gray-600";
+  if (rating < 1400) return "text-green-600";
+  if (rating < 1600) return "text-cyan-600";
+  if (rating < 1900) return "text-blue-600";
+  if (rating < 2100) return "text-purple-600";
+  return "text-orange-500";
+};
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,25 +26,19 @@ export default function Header() {
 
   useEffect(() => {
     setIsMounted(true);
-
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         const sessionUser = session?.user ?? null;
         setUser(sessionUser);
-
         if (sessionUser) {
           const { data: profileData } = await supabase
-            .from("profiles")
-            .select("full_name, rating")
-            .eq("id", sessionUser.id)
-            .single();
+            .from("profiles").select("full_name, rating").eq("id", sessionUser.id).single();
           setProfile(profileData);
         } else {
           setProfile(null);
         }
       }
     );
-
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -60,7 +54,10 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-blue-800">MedForces</Link>
+        {/* Logo */}
+        <Link href="/" className="text-2xl font-bold text-blue-800">
+          MedForces
+        </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
@@ -92,7 +89,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Hamburger Menu Button */}
+        {/* Hamburger Menu Button for Mobile */}
         <div className="md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 focus:outline-none">
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -100,11 +97,15 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (Conditionally Rendered) */}
       {isMenuOpen && (
          <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-             {/* ... Mobile links ... */}
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Home</Link>
+            <Link href="/challenges" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Challenges</Link>
+            <Link href="/practice" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Practice</Link>
+            <Link href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Leaderboard</Link>
+            <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Profile</Link>
             <hr className="my-2"/>
              {isMounted && (
                user ? (
@@ -118,8 +119,8 @@ export default function Header() {
                   </div>
                ) : (
                   <>
-                    <Link href="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Login</Link>
-                    <Link href="/signup" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Sign Up</Link>
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Login</Link>
+                    <Link href="/signup" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Sign Up</Link>
                   </>
                )
              )}
