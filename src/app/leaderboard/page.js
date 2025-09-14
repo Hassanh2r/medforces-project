@@ -3,8 +3,11 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 
-// دالة لتحديد مستوى المستخدم بناءً على التقييم
+// A safer version of the getRankInfo function
 const getRankInfo = (rating) => {
+  if (rating === null || rating === undefined) {
+    return { title: 'Unrated', color: 'text-gray-500' };
+  }
   if (rating >= 2400) return { title: 'Grandmaster', color: 'text-red-600' };
   if (rating >= 2100) return { title: 'Master', color: 'text-orange-500' };
   if (rating >= 1900) return { title: 'Candidate Master', color: 'text-purple-600' };
@@ -16,7 +19,7 @@ const getRankInfo = (rating) => {
 
 export default async function LeaderboardPage() {
   
-  // استدعاء الدالة الجديدة من قاعدة البيانات
+  // Fetching the new professional leaderboard data
   const { data: leaderboardData, error } = await supabase.rpc('get_professional_leaderboard');
 
   if (error) {
@@ -45,14 +48,14 @@ export default async function LeaderboardPage() {
               {leaderboardData?.map((user) => {
                 const rankInfo = getRankInfo(user.rating);
                 let rankClass = '';
-                if (user.rank === 1) rankClass = 'bg-yellow-100 text-yellow-800';
-                if (user.rank === 2) rankClass = 'bg-gray-200 text-gray-800';
-                if (user.rank === 3) rankClass = 'bg-orange-200 text-orange-800';
+                if (user.rank === 1) rankClass = 'bg-yellow-100/50';
+                if (user.rank === 2) rankClass = 'bg-gray-200/50';
+                if (user.rank === 3) rankClass = 'bg-orange-200/50';
                 
                 return (
-                  <tr key={user.full_name} className="hover:bg-gray-50">
-                    <td className={`px-6 py-4 text-center font-bold text-lg ${rankClass}`}>
-                      {user.rank}
+                  <tr key={user.rank} className={`${rankClass} hover:bg-blue-50`}>
+                    <td className="px-6 py-4 text-center">
+                      <span className="font-bold text-lg text-gray-700">{user.rank}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-bold text-lg">
@@ -60,8 +63,8 @@ export default async function LeaderboardPage() {
                       </div>
                       <div className="text-sm text-gray-500">{rankInfo.title}</div>
                     </td>
-                    <td className="px-6 py-4 text-center font-bold text-xl">
-                      <span className={rankInfo.color}>{user.rating}</span>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`font-bold text-xl ${rankInfo.color}`}>{user.rating}</span>
                     </td>
                   </tr>
                 );

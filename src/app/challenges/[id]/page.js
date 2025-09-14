@@ -33,6 +33,7 @@ export default function ContestPage({ params }) {
   const [score, setScore] = useState(0);
   const [quizManuallyFinished, setQuizManuallyFinished] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quizStartTime, setQuizStartTime] = useState(null); // <<-- التعديل الأول: إضافة متغير حالة جديد
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,22 +125,45 @@ export default function ContestPage({ params }) {
     }, 1000);
     return () => clearInterval(interval);
   }, [challenge, quizManuallyFinished, hasCompleted]); 
+
+  // <<-- التعديل الثاني: هذا التأثير الجديد يسجل وقت بدء الاختبار -->>
+  useEffect(() => {
+    if (contestState === 'Running' && !quizStartTime) {
+      setQuizStartTime(Date.now());
+    }
+  }, [contestState, quizStartTime]);
   
+  // <<-- التعديل الثالث: تحديث دالة `handleNextQuestion` بالكامل -->>
   const handleNextQuestion = async () => {
     if (selectedAnswer === null) return;
     const isCorrect = selectedAnswer === questions[currentQuestionIndex].correct_answer_index;
     const nextIndex = currentQuestionIndex + 1;
+    
     if (nextIndex < questions.length) {
-      if (isCorrect) { setScore(prevScore => prevScore + 1); }
+      if (isCorrect) { 
+        setScore(prevScore => prevScore + 1); 
+      }
       setCurrentQuestionIndex(nextIndex);
       setSelectedAnswer(null);
     } else {
       if (isSubmitting) return; 
       setIsSubmitting(true);
+      
       const finalScore = isCorrect ? score + 1 : score;
       setScore(finalScore);
+      
+      // حساب الوقت المستغرق بالثواني
+      const endTime = Date.now();
+      const totalTimeSeconds = quizStartTime ? Math.round((endTime - quizStartTime) / 1000) : 0;
+
       if (user) {
-        await supabase.from('quiz_results').insert([{ user_id: user.id, challenge_id: challenge.id, score: finalScore }]);
+        // حفظ النتيجة مع الوقت المستغرق
+        await supabase.from('quiz_results').insert([{
+          user_id: user.id,
+          challenge_id: challenge.id,
+          score: finalScore,
+          total_time_seconds: totalTimeSeconds 
+        }]);
       }
       setQuizManuallyFinished(true);
     }
