@@ -3,7 +3,7 @@
 /* ============ Root Variables ============ */
 :root {
   --background: #ffffff;   /* Light mode background */
-  --foreground: #000000;   /* Light mode text (black) */
+  --foreground: #171717;   /* Light mode text (black) */
 
   --muted-foreground: #6b7280; /* Gray 500 */
 }
@@ -11,7 +11,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;   /* Dark mode background */
-    --foreground: #ffffff;   /* Dark mode text (white) */
+    --foreground: #ededed;   /* Dark mode text (white) */
 
     --muted-foreground: #9ca3af; /* Gray 400 */
   }
@@ -33,19 +33,6 @@ body {
   font-family: var(--font-sans);
   margin: 0;
   padding: 0;
-}
-
-/* ========= Utility Helpers ========= */
-.text-default {
-  color: var(--foreground, #000000);
-}
-
-.text-muted {
-  color: var(--muted-foreground, #6b7280);
-}
-
-.bg-default {
-  background-color: var(--background, #ffffff);
 }
 
 /* ========= Custom Styles for MedForces ========= */
