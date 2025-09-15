@@ -1,66 +1,95 @@
-// src/app/leaderboard/page.js
-"use client"; // This makes it a Client Component
+"use client";
 
-import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { supabase } from '@/lib/supabaseClient';
-import useAuth from '@/hooks/useAuth'; // We'll use this to protect the page
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { supabase } from "@/lib/supabaseClient";
 
 const getRankInfo = (rating) => {
-  if (rating === null || rating === undefined) return { title: 'Unrated', color: 'text-gray-500' };
-  if (rating >= 2400) return { title: 'Grandmaster', color: 'text-red-600' };
-  if (rating >= 2100) return { title: 'Master', color: 'text-orange-500' };
-  if (rating >= 1900) return { title: 'Candidate Master', color: 'text-purple-600' };
-  if (rating >= 1600) return { title: 'Expert', color: 'text-blue-600' };
-  if (rating >= 1400) return { title: 'Specialist', color: 'text-cyan-600' };
-  if (rating >= 1200) return { title: 'Pupil', color: 'text-green-600' };
-  return { title: 'Newbie', color: 'text-gray-500' };
+  if (rating === null || rating === undefined) {
+    return { title: "Unrated", color: "text-gray-500" };
+  }
+  if (rating >= 2400) return { title: "Grandmaster", color: "text-red-600" };
+  if (rating >= 2100) return { title: "Master", color: "text-orange-500" };
+  if (rating >= 1900) return { title: "Candidate Master", color: "text-purple-600" };
+  if (rating >= 1600) return { title: "Expert", color: "text-blue-600" };
+  if (rating >= 1400) return { title: "Specialist", color: "text-cyan-600" };
+  if (rating >= 1200) return { title: "Pupil", color: "text-green-600" };
+  return { title: "Newbie", color: "text-gray-500" };
 };
 
 export default function LeaderboardPage() {
-  const { user, loading: authLoading } = useAuth();
-  const [leaderboardData, setLeaderboardData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    // This function fetches the latest data
-    const fetchLeaderboard = async () => {
-      const { data, error } = await supabase.rpc('get_professional_leaderboard');
-      if (error) {
-        console.error('Error fetching leaderboard:', error);
-      } else {
-        setLeaderboardData(data);
+    const checkAuthAndFetch = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login"); // ⬅️ redirect لو مفيش مستخدم
+        return;
       }
-      setIsLoading(false);
-    };
 
-    if (user) {
-      // 1. Fetch the initial data
-      fetchLeaderboard();
+      // جلب بيانات leaderboard
+      const { data, error } = await supabase.rpc("get_professional_leaderboard");
+      if (error) {
+        console.error("Error fetching leaderboard:", error);
+      } else {
+        setLeaderboard(data || []);
+      }
 
-      // 2. Set up the real-time listener
+      // Realtime listener
       const channel = supabase
-        .channel('public:quiz_results')
+        .channel("leaderboard-changes")
         .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'quiz_results' },
+          "postgres_changes",
+          { event: "*", schema: "public", table: "contest_results" },
           (payload) => {
-            // When a new result is inserted, fetch the whole leaderboard again
-            fetchLeaderboard();
+            setLeaderboard((prev) => {
+              let updated = [...prev];
+
+              if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+                const newUser = payload.new;
+                const idx = updated.findIndex((u) => u.user_id === newUser.user_id);
+                if (idx !== -1) {
+                  updated[idx] = { ...updated[idx], rating: newUser.rating };
+                } else {
+                  updated.push(newUser);
+                }
+              } else if (payload.eventType === "DELETE") {
+                updated = updated.filter((u) => u.user_id !== payload.old.user_id);
+              }
+
+              updated.sort((a, b) => b.rating - a.rating);
+              updated = updated.map((u, i) => ({ ...u, rank: i + 1 }));
+
+              return updated;
+            });
           }
         )
         .subscribe();
-      
-      // 3. Clean up the listener when the page is closed
+
+      setLoading(false);
+
       return () => {
         supabase.removeChannel(channel);
       };
-    }
-  }, [user]);
+    };
 
-  if (authLoading || isLoading) {
-    return <div className="text-center py-10">Loading...</div>;
+    checkAuthAndFetch();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -69,34 +98,44 @@ export default function LeaderboardPage() {
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">Official Rankings</h1>
-          <p className="mt-3 text-lg text-gray-600">See the official ratings of all MedForces competitors.</p>
+          <p className="mt-3 text-lg text-gray-600">
+            See the official ratings of all MedForces competitors.
+          </p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl mx-auto">
           <table className="min-w-full text-left">
             <thead className="bg-gray-100 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase text-center">#</th>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase">User</th>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase text-center">Rating</th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-center">#</th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                <th className="px-6 py-4 text-sm font-semibold text-gray-600 uppercase tracking-wider text-center">Rating</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {leaderboardData?.map((userData) => {
-                const rankInfo = getRankInfo(userData.rating);
+              {leaderboard.map((user) => {
+                const rankInfo = getRankInfo(user.rating);
+                let rankClass = "";
+                if (user.rank === 1) rankClass = "bg-yellow-100/50";
+                if (user.rank === 2) rankClass = "bg-gray-200/50";
+                if (user.rank === 3) rankClass = "bg-orange-200/50";
+
                 return (
-                  <tr key={userData.rank} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-center font-bold text-lg">{userData.rank}</td>
+                  <tr key={user.user_id} className={`${rankClass} hover:bg-blue-50`}>
+                    <td className="px-6 py-4 text-center">
+                      <span className="font-bold text-lg text-gray-700">{user.rank}</span>
+                    </td>
                     <td className="px-6 py-4">
-                      <div className={`font-bold ${rankInfo.color}`}>{userData.full_name}</div>
+                      <div className="font-bold text-lg">
+                        <span className={rankInfo.color}>{user.full_name}</span>
+                      </div>
                       <div className="text-sm text-gray-500">{rankInfo.title}</div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className={`font-bold text-xl ${rankInfo.color}`}>{userData.rating}</span>
+                      <span className={`font-bold text-xl ${rankInfo.color}`}>{user.rating}</span>
                     </td>
                   </tr>
                 );
-
               })}
             </tbody>
           </table>

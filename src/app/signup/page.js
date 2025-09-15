@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabaseClient'; // استيراد العميل للتواصل مع Supabase
+import { supabase } from '@/lib/supabaseClient';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -15,19 +15,19 @@ export default function SignupPage() {
     event.preventDefault();
     setMessage('');
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`, // رابط التأكيد
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
     if (error) {
       setMessage(`Error: ${error.message}`);
     } else {
-      setMessage("Account created! Please check your email to confirm before logging in.");
+      setMessage("✅ Account created! Please check your email to confirm before logging in.");
       setEmail('');
       setPassword('');
       setFullName('');
@@ -41,14 +41,14 @@ export default function SignupPage() {
           <h1 className="text-3xl font-extrabold text-gray-900">
             Create a New Account
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-700">
             Join the MedForces community today!
           </p>
         </div>
         
         <form className="space-y-6" onSubmit={handleSignUp}>
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-800">
               Full Name
             </label>
             <div className="mt-1">
@@ -65,7 +65,7 @@ export default function SignupPage() {
           </div>
           
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-800">
               Email address
             </label>
             <div className="mt-1">
@@ -82,7 +82,7 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-800">
               Password
             </label>
             <div className="mt-1">
@@ -109,12 +109,12 @@ export default function SignupPage() {
         </form>
 
         {message && (
-          <p className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-md border border-green-200">
+          <p className={`text-center text-sm ${message.startsWith("Error") ? "text-red-600 bg-red-50 border border-red-200" : "text-green-600 bg-green-50 border border-green-200"} p-3 rounded-md`}>
             {message}
           </p>
         )}
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-700">
           Already have an account?{' '}
           <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
             Login

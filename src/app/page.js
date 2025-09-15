@@ -56,7 +56,7 @@ export default function Home() {
             {/* Card 1 */}
             <div className="bg-gray-50 p-8 rounded-lg shadow-md">
               <div className="flex justify-center items-center mb-4">
-                <div className="bg-emerald-100 p-3 rounded-full">
+                <div className="bg-emerald-100 p-3 rounded-full text-emerald-700">
                   <BeakerIcon />
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function Home() {
             {/* Card 2 */}
             <div className="bg-gray-50 p-8 rounded-lg shadow-md">
               <div className="flex justify-center items-center mb-4">
-                <div className="bg-emerald-100 p-3 rounded-full">
+                <div className="bg-emerald-100 p-3 rounded-full text-emerald-700">
                   <BookOpenIcon />
                 </div>
               </div>
@@ -76,7 +76,7 @@ export default function Home() {
             {/* Card 3 */}
             <div className="bg-gray-50 p-8 rounded-lg shadow-md">
               <div className="flex justify-center items-center mb-4">
-                <div className="bg-emerald-100 p-3 rounded-full">
+                <div className="bg-emerald-100 p-3 rounded-full text-emerald-700">
                   <TrophyIcon />
                 </div>
               </div>

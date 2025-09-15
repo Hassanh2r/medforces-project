@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 import useAuth from '@/hooks/useAuth';
 
-// Helper function for rank color (can be moved to a separate file later)
+// Helper function for rank color
 const getRankColor = (rating) => {
   if (!rating) return "text-gray-700";
   if (rating < 1200) return "text-gray-600";
@@ -27,21 +27,29 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ total_attempts: 0, average_score: 0 });
   const [loadingData, setLoadingData] = useState(true);
 
+  // For editing username
+  const [newName, setNewName] = useState("");
+  const [updating, setUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
+  const [editing, setEditing] = useState(false);
+
   useEffect(() => {
     if (user) {
       const fetchData = async () => {
         setLoadingData(true);
         
-        // Fetch all data in parallel for better performance
         const [profileRes, resultsRes, statsRes] = await Promise.all([
           supabase.from('profiles').select('*').eq('id', user.id).single(),
           supabase.rpc('get_user_results', { p_user_id: user.id }),
           supabase.rpc('get_user_stats', { p_user_id: user.id })
         ]);
 
-        if(profileRes.data) setProfile(profileRes.data);
-        if(resultsRes.data) setResults(resultsRes.data);
-        if(statsRes.data && statsRes.data.length > 0) setStats(statsRes.data[0]);
+        if (profileRes.data) {
+          setProfile(profileRes.data);
+          setNewName(profileRes.data.full_name || ""); // pre-fill input
+        }
+        if (resultsRes.data) setResults(resultsRes.data);
+        if (statsRes.data && statsRes.data.length > 0) setStats(statsRes.data[0]);
         
         setLoadingData(false);
       };
@@ -49,21 +57,86 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  const handleUpdateName = async () => {
+    if (!newName.trim()) {
+      setUpdateMessage("Name cannot be empty.");
+      return;
+    }
+    setUpdating(true);
+    setUpdateMessage("");
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: newName })
+      .eq("id", user.id);
+
+    if (error) {
+      setUpdateMessage("Error updating name. Try again.");
+    } else {
+      setProfile({ ...profile, full_name: newName });
+      setUpdateMessage("Name updated successfully!");
+      setEditing(false);
+    }
+    setUpdating(false);
+  };
+
   if (authLoading || loadingData) {
     return <div className="text-center py-10">Loading profile...</div>;
   }
-  
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <main className="flex-grow container mx-auto px-6 py-12">
         {/* Profile Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-800">{profile?.full_name || user.email}</h1>
-          <p className={`mt-2 text-2xl font-bold ${getRankColor(profile?.rating)}`}>
-            Rating: {profile?.rating || 'N/A'}
+          <h1 className="text-4xl font-extrabold text-gray-800">
+            {profile?.full_name ?? user?.email}
+          </h1>
+          <p className={`mt-2 text-2xl font-bold ${getRankColor(profile?.rating ?? 0)}`}>
+            Rating: {profile?.rating ?? "N/A"}
           </p>
+          {!editing && (
+            <button
+              onClick={() => setEditing(true)}
+              className="mt-3 text-blue-600 hover:underline"
+            >
+              Change your name
+            </button>
+          )}
         </div>
+
+        {/* Edit Username Section */}
+        {editing && (
+          <div className="mb-12 bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Change Username</h2>
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter new username"
+              />
+              <button
+                onClick={handleUpdateName}
+                disabled={updating}
+                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
+              >
+                {updating ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={() => setEditing(false)}
+                className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+            {updateMessage && (
+              <p className="mt-3 text-sm text-gray-600">{updateMessage}</p>
+            )}
+          </div>
+        )}
 
         {/* Stats and Recent Activity Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -98,7 +171,7 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
             {results.length > 0 ? (
               <ul className="divide-y divide-gray-200">
-                {results.slice(0, 10).map((result, index) => ( // Show last 10 attempts
+                {results.slice(0, 10).map((result, index) => ( 
                   <li key={index} className="py-4 flex justify-between items-center">
                     <div>
                       <p className="font-semibold text-lg text-blue-800">{result.challenge_title}</p>
@@ -114,7 +187,7 @@ export default function ProfilePage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-600 text-center py-10">You havent completed any challenges yet.</p>
+              <p className="text-gray-600 text-center py-10">You haven&apos;t completed any challenges yet.</p>
             )}
           </div>
         </div>
