@@ -1,4 +1,6 @@
 // src/app/challenges/[id]/page.js
+export const runtime = 'edge';
+
 "use client";
 
 import { useState, useEffect, use } from 'react';
