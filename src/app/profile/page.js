@@ -221,7 +221,7 @@ export default function ProfilePage() {
                     <li key={index}>
                       <div className="flex justify-between mb-1">
                         <span className="font-semibold">{subj.subject_name}</span>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-800">
                           {subj.accuracy.toFixed(1)}%
                         </span>
                       </div>
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-600 text-center">No subject performance data yet.</p>
+                <p className="text-gray-800 text-center">No subject performance data yet.</p>
               )}
             </div>
 
