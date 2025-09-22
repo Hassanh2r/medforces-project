@@ -8,6 +8,17 @@ import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 import useAuth from '@/hooks/useAuth';
 
+// 📊 مكتبة الرسم البياني
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
 // Helper function for rank color
 const getRankColor = (rating) => {
   if (!rating) return "text-gray-700";
@@ -27,6 +38,10 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ total_attempts: 0, average_score: 0 });
   const [loadingData, setLoadingData] = useState(true);
 
+  // ⬇️ بيانات جديدة
+  const [ratingHistory, setRatingHistory] = useState([]);
+  const [performance, setPerformance] = useState([]);
+
   // For editing username
   const [newName, setNewName] = useState("");
   const [updating, setUpdating] = useState(false);
@@ -38,10 +53,12 @@ export default function ProfilePage() {
       const fetchData = async () => {
         setLoadingData(true);
         
-        const [profileRes, resultsRes, statsRes] = await Promise.all([
+        const [profileRes, resultsRes, statsRes, ratingRes, perfRes] = await Promise.all([
           supabase.from('profiles').select('*').eq('id', user.id).single(),
           supabase.rpc('get_user_results', { p_user_id: user.id }),
-          supabase.rpc('get_user_stats', { p_user_id: user.id })
+          supabase.rpc('get_user_stats', { p_user_id: user.id }),
+          supabase.rpc('get_user_rating_history', { p_user_id: user.id }),
+          supabase.rpc('get_performance_by_subject', { p_user_id: user.id })
         ]);
 
         if (profileRes.data) {
@@ -50,6 +67,8 @@ export default function ProfilePage() {
         }
         if (resultsRes.data) setResults(resultsRes.data);
         if (statsRes.data && statsRes.data.length > 0) setStats(statsRes.data[0]);
+        if (ratingRes.data) setRatingHistory(ratingRes.data);
+        if (perfRes.data) setPerformance(perfRes.data);
         
         setLoadingData(false);
       };
@@ -143,6 +162,7 @@ export default function ProfilePage() {
           
           {/* Left Column: Stats */}
           <div className="lg:col-span-1 space-y-8">
+            {/* 📌 Statistics */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Statistics</h2>
               <div className="space-y-4">
@@ -158,37 +178,91 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-             <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Ready for more?</h2>
-                <Link href="/challenges" className="w-full inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105">
-                    Go to contests
-                </Link>
+
+            {/* 📊 Rating History Chart */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Rating Progress</h2>
+              {ratingHistory.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={ratingHistory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="contest_date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="new_rating" stroke="#2563eb" strokeWidth={3} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-gray-500 text-center">No rating history yet.</p>
+              )}
+            </div>
+
+            {/* 🔗 Go to contests */}
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Ready for more?</h2>
+              <Link
+                href="/challenges"
+                className="w-full inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
+              >
+                Go to contests
+              </Link>
             </div>
           </div>
 
-          {/* Right Column: Recent Activity */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
-            {results.length > 0 ? (
-              <ul className="divide-y divide-gray-200">
-                {results.slice(0, 10).map((result, index) => ( 
-                  <li key={index} className="py-4 flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold text-lg text-blue-800">{result.challenge_title}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(result.taken_at).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-xl text-green-600">{result.score}</p>
-                      <p className="text-sm text-gray-500">Points</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-600 text-center py-10">You haven&apos;t completed any challenges yet.</p>
-            )}
+          {/* Right Column: Performance + Recent Activity */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* 📚 Performance by Subject */}
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance by Subject</h2>
+              {performance.length > 0 ? (
+                <ul className="space-y-4">
+                  {performance.map((subj, index) => (
+                    <li key={index}>
+                      <div className="flex justify-between mb-1">
+                        <span className="font-semibold">{subj.subject_name}</span>
+                        <span className="text-sm text-gray-600">
+                          {subj.accuracy.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div
+                          className="bg-blue-600 h-3 rounded-full"
+                          style={{ width: `${subj.accuracy}%` }}
+                        ></div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-600 text-center">No subject performance data yet.</p>
+              )}
+            </div>
+
+            {/* 🕓 Recent Activity */}
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+              {results.length > 0 ? (
+                <ul className="divide-y divide-gray-200">
+                  {results.slice(0, 10).map((result, index) => ( 
+                    <li key={index} className="py-4 flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-lg text-blue-800">{result.challenge_title}</p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(result.taken_at).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-xl text-green-600">{result.score}</p>
+                        <p className="text-sm text-gray-500">Points</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-600 text-center py-10">You haven&apos;t completed any challenges yet.</p>
+              )}
+            </div>
           </div>
         </div>
       </main>

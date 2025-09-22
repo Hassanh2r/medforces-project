@@ -64,6 +64,7 @@ export default function Header() {
           <Link href="/" className="text-gray-600 hover:text-blue-600 transition">Home</Link>
           <Link href="/challenges" className="text-gray-600 hover:text-blue-600 transition">Challenges</Link>
           <Link href="/practice" className="text-gray-600 hover:text-blue-600 transition">Practice</Link>
+          <Link href="/articles" className="text-gray-600 hover:text-blue-600 transition">Learn</Link>
           <Link href="/leaderboard" className="text-gray-600 hover:text-blue-600 transition">Leaderboard</Link>
           <Link href="/profile" className="text-gray-600 hover:text-blue-600 transition">Profile</Link>
         </div>
@@ -104,6 +105,7 @@ export default function Header() {
             <Link href="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Home</Link>
             <Link href="/challenges" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Challenges</Link>
             <Link href="/practice" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Practice</Link>
+            <Link href="/articles" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Learn</Link>
             <Link href="/leaderboard" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Leaderboard</Link>
             <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Profile</Link>
             <hr className="my-2"/>

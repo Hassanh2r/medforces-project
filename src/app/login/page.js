@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,6 +29,8 @@ export default function LoginPage() {
     if (error) {
       setMessage(`Error: ${error.message}`);
     } else {
+      // Refresh the page to update the server session, then redirect
+      router.refresh(); 
       router.push("/");
     }
   };
@@ -39,7 +42,7 @@ export default function LoginPage() {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`, // صفحة تعملها لاحقًا
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
@@ -52,7 +55,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4">
       <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-lg rounded-xl">
-        {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">
             Login to MedForces
@@ -62,13 +64,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Form */}
         <form className="space-y-6" onSubmit={handleLogin}>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
               Email address
             </label>
             <div className="mt-1">
@@ -83,12 +81,8 @@ export default function LoginPage() {
               />
             </div>
           </div>
-
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-900"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
               Password
             </label>
             <div className="mt-1">
@@ -103,8 +97,7 @@ export default function LoginPage() {
               />
             </div>
           </div>
-
-          <div className="flex justify-between items-center">
+          <div>
             <button
               type="submit"
               disabled={loading}
@@ -115,31 +108,21 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {/* Error or success Message */}
         {message && (
-          <p className="text-center text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
+          <p className={`text-center text-sm p-3 rounded-md border ${message.startsWith('Error') ? 'text-red-600 bg-red-50 border-red-200' : 'text-green-600 bg-green-50 border-green-200'}`}>
             {message}
           </p>
         )}
 
-        {/* Forgot Password */}
-        <p className="text-center text-sm text-gray-700">
-          <button
-            type="button"
-            onClick={handleResetPassword}
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
+        <div className="text-center text-sm text-gray-700">
+          <button type="button" onClick={handleResetPassword} className="font-medium text-blue-600 hover:text-blue-500">
             Forgot your password?
           </button>
-        </p>
+        </div>
 
-        {/* Signup link */}
         <p className="text-center text-sm text-gray-700">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
+          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up
           </Link>
         </p>

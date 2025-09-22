@@ -3,6 +3,10 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
+// This line tells Vercel to build a static version of this page
+// and only rebuild it when you deploy new code.
+export const revalidate = false; 
+
 // Placeholder icons from Heroicons (SVG code)
 const BeakerIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
