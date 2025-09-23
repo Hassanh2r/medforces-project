@@ -5,9 +5,6 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const runtime = 'edge';
 
-// سيتم تحديث هذه الصفحة كل ساعة (3600 ثانية)
-export const revalidate = 3600;
-
 export default async function ArticlePage({ params }) {
   const { slug } = params;
 

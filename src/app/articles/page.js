@@ -4,9 +4,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 
-// سيتم تحديث هذه الصفحة كل ساعة (3600 ثانية)
-export const revalidate = 3600;
-
 // هذه صفحة خادم (Server Component) لجلب البيانات بسرعة
 export default async function ArticlesListPage() {
   const { data: articles, error } = await supabase
