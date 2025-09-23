@@ -4,14 +4,21 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 
-// هذه صفحة خادم (Server Component) لجلب البيانات بسرعة
+export const runtime = 'edge';
+
+// إيقاف الكاش → الصفحة SSR دايمًا
+export const revalidate = 0;
+
+// هذه صفحة خادم (Server Component) لجلب البيانات مباشرة من Supabase
 export default async function ArticlesListPage() {
   const { data: articles, error } = await supabase
     .from('articles')
     .select('title, slug, created_at')
     .order('created_at', { ascending: false });
 
-  if (error) console.error('Error fetching articles:', error);
+  if (error) {
+    console.error('Error fetching articles:', error);
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -19,14 +26,15 @@ export default async function ArticlesListPage() {
       <main className="flex-grow container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-800">Learn</h1>
-          <p className="mt-2 text-lg text-gray-600">Browse our collection of articles and explanations.</p>
+          <p className="mt-2 text-lg text-gray-600">
+            Browse our collection of articles and explanations.
+          </p>
         </div>
-
 
         <div className="max-w-4xl mx-auto space-y-6">
           {articles?.map((article) => (
-            <Link 
-              href={`/articles/${article.slug}`} 
+            <Link
+              href={`/articles/${article.slug}`}
               key={article.slug}
               className="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
             >
