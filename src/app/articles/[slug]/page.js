@@ -5,12 +5,6 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const runtime = 'edge';
 
-// دالة بسيطة لاكتشاف اللغة (عربي / إنجليزي) بناءً على الحروف
-function detectDirection(text) {
-  const arabicRegex = /[\u0600-\u06FF]/; // رينج الحروف العربية
-  return arabicRegex.test(text) ? "rtl" : "ltr";
-}
-
 export default async function ArticlePage({ params }) {
   const { slug } = params;
 
@@ -23,8 +17,8 @@ export default async function ArticlePage({ params }) {
   if (error) console.error("Error fetching article:", error);
   if (!article) return <div>Article not found.</div>;
 
-  // تحديد الاتجاه من عنوان المقال أو المحتوى
-  const dir = detectDirection(article.title || article.content || "");
+  // استخدام الحقل الجديد
+  const dir = article.lang === "ar" ? "rtl" : "ltr";
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50" dir={dir}>
@@ -67,7 +61,8 @@ export default async function ArticlePage({ params }) {
                   : "text-left border-l-4 border-blue-500 pl-3"
               }`}
             >
-              ✍️ Published on{" "}
+              ✍️{" "}
+              {dir === "rtl" ? "نُشر في" : "Published on"}{" "}
               {new Date(article.created_at).toLocaleDateString(
                 dir === "rtl" ? "ar-EG" : "en-US",
                 {
