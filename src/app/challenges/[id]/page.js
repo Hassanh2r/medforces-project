@@ -206,7 +206,7 @@ export default function ContestPage({ params }) {
       case 'Running':
         return (
           <div className="text-left">
-            <div className="text-center mb-8 border-b pb-4"><p className="font-semibold">Time Remaining:</p><p className="text-4xl font-bold tracking-widest text-red-600">{timeRemaining}</p></div>
+            <div className="text-center mb-8 border-b pb-4"><p className="font-semibold text-gray-800">Time Remaining:</p><p className="text-4xl font-bold tracking-widest text-red-600">{timeRemaining}</p></div>
             {isRegistered ? <QuizInterface /> : ( <div className="text-center p-8"><h2 className="text-2xl font-bold text-gray-800 mb-4">The Contest is Running!</h2><p className="text-red-600 font-semibold mb-6">You must register to participate.</p><button onClick={handleRegister} className="px-10 py-3 bg-green-600 text-white font-bold text-xl rounded-lg shadow-md hover:bg-green-700">Register & Join Now</button></div> )}
           </div>
         );
@@ -215,7 +215,7 @@ export default function ContestPage({ params }) {
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900">Contest Finished</h1>
             <p className="mt-4 text-xl text-gray-800">Your final score: <span className="font-bold text-green-600">{score}</span> / {questions.length}</p>
-            <p className="mt-4">Check the <Link href="/leaderboard" className="text-blue-600 font-bold hover:underline">Leaderboard</Link> for final standings.</p>
+            <p className="mt-4 text-gray-800">Check the <Link href="/leaderboard" className="text-blue-600 font-bold hover:underline">Leaderboard</Link> for final standings.</p>
           </div>
         );
       default:
