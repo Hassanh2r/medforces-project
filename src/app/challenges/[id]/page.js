@@ -150,16 +150,16 @@ export default function ContestPage({ params }) {
     const currentQuestion = questions[currentQuestionIndex];
     if (!currentQuestion) {
       if (questions.length > 0 && currentQuestionIndex >= questions.length) {
-        return <p className="text-center">Calculating final score...</p>;
+        return <p className="text-center text-gray-800">Calculating final score...</p>;
       }
-      return <p className="text-center">No questions available for this contest.</p>;
+      return <p className="text-center text-gray-800">No questions available for this contest.</p>;
     }
     return (
       <div>
-        <p className="text-lg font-medium text-gray-800 mb-6">{currentQuestionIndex + 1}. {currentQuestion.question_text}</p>
+        <p className="text-lg font-medium text-gray-900 mb-6">{currentQuestionIndex + 1}. {currentQuestion.question_text}</p>
         <div className="space-y-4">
           {currentQuestion.options.map((option, index) => (
-            <button key={index} onClick={() => setSelectedAnswer(index)} className={`w-full text-left p-4 rounded-lg border-2 ${selectedAnswer === index ? 'border-blue-500 bg-blue-50' : 'bg-white hover:border-blue-400'}`}>
+            <button key={index} onClick={() => setSelectedAnswer(index)} className={`w-full text-left p-4 rounded-lg border-2 text-gray-800 ${selectedAnswer === index ? 'border-blue-500 bg-blue-50' : 'bg-white hover:border-blue-400'}`}>
               {option}
             </button>
           ))}
@@ -174,14 +174,14 @@ export default function ContestPage({ params }) {
   };
   
   const renderContent = () => {
-    if (loading) return <p className="text-center animate-pulse">Loading Contest...</p>;
-    if (!challenge) return <p className="text-center">Contest not found.</p>;
+    if (loading) return <p className="text-center animate-pulse text-gray-800">Loading Contest...</p>;
+    if (!challenge) return <p className="text-center text-gray-800">Contest not found.</p>;
 
     if (hasCompleted) {
         return (
             <div className="text-center">
-                <h1 className="text-3xl font-bold text-gray-800">Contest Already Completed</h1>
-                <p className="mt-4 text-lg text-gray-600">You have already participated in this contest.</p>
+                <h1 className="text-3xl font-bold text-gray-900">Contest Already Completed</h1>
+                <p className="mt-4 text-lg text-gray-800">You have already participated in this contest.</p>
                 <div className="mt-6 bg-blue-50 p-6 rounded-lg">
                     <p className="text-lg font-semibold text-blue-800">Your Score:</p>
                     <p className="text-4xl font-bold text-green-600">{score} / {questions.length}</p>
@@ -198,7 +198,7 @@ export default function ContestPage({ params }) {
         return (
           <div className="text-center">
             <h1 className="text-4xl font-extrabold text-blue-800 mb-4">{challenge.title}</h1>
-            <p className="text-lg text-gray-700 mb-6">{challenge.description}</p>
+            <p className="text-lg text-gray-800 mb-6">{challenge.description}</p>
             <div className="bg-blue-100 text-blue-800 p-6 rounded-xl mb-8"><p className="text-lg font-semibold">Contest Starts In:</p><p className="text-4xl font-bold tracking-widest">{timeRemaining}</p></div>
             {isRegistered ? <p className="px-10 py-3 bg-green-200 text-green-800 font-bold text-xl rounded-lg">You are Registered!</p> : <button onClick={handleRegister} className="px-10 py-3 bg-green-600 text-white font-bold text-xl rounded-lg shadow-md hover:bg-green-700">Register Now</button>}
           </div>
@@ -213,8 +213,8 @@ export default function ContestPage({ params }) {
       case 'Finished':
         return (
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-800">Contest Finished</h1>
-            <p className="mt-4 text-xl">Your final score: <span className="font-bold text-green-600">{score}</span> / {questions.length}</p>
+            <h1 className="text-4xl font-bold text-gray-900">Contest Finished</h1>
+            <p className="mt-4 text-xl text-gray-800">Your final score: <span className="font-bold text-green-600">{score}</span> / {questions.length}</p>
             <p className="mt-4">Check the <Link href="/leaderboard" className="text-blue-600 font-bold hover:underline">Leaderboard</Link> for final standings.</p>
           </div>
         );
