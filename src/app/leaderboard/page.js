@@ -35,12 +35,32 @@ export default function LeaderboardPage() {
         return;
       }
 
+      // جيب سنة المستخدم
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("academic_year")
+        .eq("id", user.id)
+        .single();
+
+    if (profileError) {
+  console.error("Error fetching profile:", profileError);
+  return;
+      }
+
+      const userYear = profile.academic_year;
+
       // جلب بيانات leaderboard
       const { data, error } = await supabase.rpc("get_professional_leaderboard");
       if (error) {
         console.error("Error fetching leaderboard:", error);
       } else {
-        setLeaderboard(data || []);
+        const filtered = (data || []).filter((u) => u.academic_year === userYear);
+
+        // ترتيب وإضافة rank
+        filtered.sort((a, b) => b.rating - a.rating);
+        const ranked = filtered.map((u, i) => ({ ...u, rank: i + 1 }));
+
+        setLeaderboard(ranked);
       }
 
       // Realtime listener
@@ -52,9 +72,12 @@ export default function LeaderboardPage() {
           (payload) => {
             setLeaderboard((prev) => {
               let updated = [...prev];
+              const newUser = payload.new;
+
+              // تجاهل لو مش نفس السنة
+              if (newUser.academic_year !== userYear) return prev;
 
               if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-                const newUser = payload.new;
                 const idx = updated.findIndex((u) => u.user_id === newUser.user_id);
                 if (idx !== -1) {
                   updated[idx] = { ...updated[idx], rating: newUser.rating };
@@ -99,7 +122,7 @@ export default function LeaderboardPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">Official Rankings</h1>
           <p className="mt-3 text-lg text-gray-600">
-            See the official ratings of all MedForces competitors.
+            See the official ratings of all MedForces competitors (filtered by your year).
           </p>
         </div>
 

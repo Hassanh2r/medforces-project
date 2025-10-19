@@ -11,21 +11,32 @@ import Papa from 'papaparse';
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  // States for Question Upload
   const [file, setFile] = useState(null);
   const [parsedData, setParsedData] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
 
+  // States for creating a lecture
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  const [newLectureName, setNewLectureName] = useState('');
+  const [isCreatingLecture, setIsCreatingLecture] = useState(false);
+
   useEffect(() => {
-    if (user) {
-      const checkAdminRole = async () => {
-        const { data } = await supabase.rpc('get_my_role');
-        if (data === 'admin') {
+    const checkAdminAndFetchData = async () => {
+      if (user) {
+        const { data: role } = await supabase.rpc('get_my_role');
+        if (role === 'admin') {
           setIsAdmin(true);
+          // Fetch subjects for the dropdown
+          const { data: subjectsData } = await supabase.from('subjects').select('id, name').order('name');
+          setSubjects(subjectsData || []);
         }
-      };
-      checkAdminRole();
-    }
+      }
+    };
+    checkAdminAndFetchData();
   }, [user]);
 
   const handleFileChange = (e) => {
@@ -52,20 +63,12 @@ export default function AdminDashboardPage() {
 
     const questionsToInsert = parsedData.map(row => {
       let optionsArray;
-
       try {
-        // جرّب تعمل parse كـ JSON
         optionsArray = JSON.parse(row.options);
-        if (!Array.isArray(optionsArray)) {
-          throw new Error("Not an array");
-        }
+        if (!Array.isArray(optionsArray)) { throw new Error("Not an array"); }
       } catch (e) {
-        // fallback: split by comma
-        optionsArray = row.options
-          ? row.options.split(",").map(opt => opt.trim())
-          : [];
+        optionsArray = row.options ? row.options.split(",").map(opt => opt.trim()) : [];
       }
-
       return {
         question_text: row.question_text,
         options: optionsArray,
@@ -86,6 +89,29 @@ export default function AdminDashboardPage() {
     setUploading(false);
   };
 
+  const handleCreateLecture = async (e) => {
+    e.preventDefault();
+    if (!newLectureName.trim() || !selectedSubjectId) {
+        alert("Please select a subject and enter a lecture name.");
+        return;
+    }
+    setIsCreatingLecture(true);
+
+    const { data, error } = await supabase
+        .from('lectures')
+        .insert({ name: newLectureName, subject_id: selectedSubjectId })
+        .select()
+        .single();
+
+    if (error) {
+        alert("Error creating lecture: " + error.message);
+    } else {
+        alert(`Lecture "${data.name}" created successfully with ID: ${data.id}`);
+        setNewLectureName('');
+    }
+    setIsCreatingLecture(false);
+  };
+
   if (authLoading) return <p>Loading & Verifying Access...</p>;
   if (!isAdmin) return <p>Access Denied. You must be an administrator to view this page.</p>;
 
@@ -94,6 +120,51 @@ export default function AdminDashboardPage() {
       <Header />
       <main className="flex-grow container mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+        
+        <div className="bg-white p-8 rounded-lg shadow-md mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Create New Lecture</h2>
+            <form onSubmit={handleCreateLecture} className="space-y-4">
+                <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                        Select Subject
+                    </label>
+                    <select
+                        id="subject"
+                        value={selectedSubjectId}
+                        onChange={(e) => setSelectedSubjectId(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                    >
+                        <option value="" disabled>-- Choose a subject --</option>
+                        {subjects.map(subject => (
+                            <option key={subject.id} value={subject.id}>{subject.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="lectureName" className="block text-sm font-medium text-gray-700 mb-1">
+                        New Lecture Name
+                    </label>
+                    <input
+                        id="lectureName"
+                        type="text"
+                        value={newLectureName}
+                        onChange={(e) => setNewLectureName(e.target.value)}
+                        placeholder="e.g., Coronary Arteries"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    disabled={isCreatingLecture}
+                    className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 disabled:bg-gray-400"
+                >
+                    {isCreatingLecture ? 'Creating...' : 'Create Lecture'}
+                </button>
+            </form>
+        </div>
+
         <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-2">Bulk Question Upload</h2>

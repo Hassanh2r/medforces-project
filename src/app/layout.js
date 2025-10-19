@@ -1,5 +1,8 @@
+// src/app/layout.jsx
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner"; // ✨ 1. Import the Toaster
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +26,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster richColors /> {/* ✨ 2. Add the Toaster component here */}
       </body>
     </html>
   );

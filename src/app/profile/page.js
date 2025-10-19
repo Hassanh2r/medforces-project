@@ -1,14 +1,13 @@
 // src/app/profile/page.js
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { supabase } from '@/lib/supabaseClient';
-import useAuth from '@/hooks/useAuth';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { supabase } from "@/lib/supabaseClient";
+import useAuth from "@/hooks/useAuth";
 
-// 📊 مكتبة الرسم البياني
 import {
   LineChart,
   Line,
@@ -19,7 +18,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Helper function for rank color
+// Rank color helper
 const getRankColor = (rating) => {
   if (!rating) return "text-gray-700";
   if (rating < 1200) return "text-gray-600";
@@ -30,20 +29,62 @@ const getRankColor = (rating) => {
   return "text-orange-500";
 };
 
+// ✅ Universities + Years lists
+const universities = [
+  "South Valley University",
+  "South Valley National University",
+  "Cairo University",
+  "Alexandria University",
+  "Mansoura University",
+  "Assiut University",
+  "Aswan University",
+  "Ain Shams University",
+  "Zagazig University",
+  "Suez Canal University",
+  "Tanta University",
+  "Benha University",
+  "Al-Fayoum University",
+  "Beni Suef University",
+  "Sohag University",
+  "Helwan University",
+  "Misr University for Science and Technology",
+  "October 6 University",
+  "New Giza University",
+  "Delta University for Science and Technology",
+  "King Salman International University",
+  "New Mansoura University",
+  "Galala University",
+  "Horús University",
+  "Nahda University in Beni Suef",
+  "Modern University for Technology and Information (MTI)",
+  "Other",
+];
+
+const studyYears = [
+  "1st Year",
+  "2nd Year",
+  "3rd Year",
+  "4th Year",
+  "5th Year",
+  "1st intern",
+  "2nd intern",
+];
+
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
-  
+
   const [profile, setProfile] = useState(null);
   const [results, setResults] = useState([]);
   const [stats, setStats] = useState({ total_attempts: 0, average_score: 0 });
   const [loadingData, setLoadingData] = useState(true);
 
-  // ⬇️ بيانات جديدة
   const [ratingHistory, setRatingHistory] = useState([]);
   const [performance, setPerformance] = useState([]);
 
-  // For editing username
+  // Editable fields
   const [newName, setNewName] = useState("");
+  const [newUniversity, setNewUniversity] = useState("");
+  const [newYear, setNewYear] = useState("");
   const [updating, setUpdating] = useState(false);
   const [updateMessage, setUpdateMessage] = useState("");
   const [editing, setEditing] = useState(false);
@@ -52,31 +93,34 @@ export default function ProfilePage() {
     if (user) {
       const fetchData = async () => {
         setLoadingData(true);
-        
-        const [profileRes, resultsRes, statsRes, ratingRes, perfRes] = await Promise.all([
-          supabase.from('profiles').select('*').eq('id', user.id).single(),
-          supabase.rpc('get_user_results', { p_user_id: user.id }),
-          supabase.rpc('get_user_stats', { p_user_id: user.id }),
-          supabase.rpc('get_user_rating_history', { p_user_id: user.id }),
-          supabase.rpc('get_performance_by_subject', { p_user_id: user.id })
-        ]);
+
+        const [profileRes, resultsRes, statsRes, ratingRes, perfRes] =
+          await Promise.all([
+            supabase.from("profiles").select("*").eq("id", user.id).single(),
+            supabase.rpc("get_user_results", { p_user_id: user.id }),
+            supabase.rpc("get_user_stats", { p_user_id: user.id }),
+            supabase.rpc("get_user_rating_history", { p_user_id: user.id }),
+            supabase.rpc("get_performance_by_subject", { p_user_id: user.id }),
+          ]);
 
         if (profileRes.data) {
           setProfile(profileRes.data);
-          setNewName(profileRes.data.full_name || ""); // pre-fill input
+          setNewName(profileRes.data.full_name || "");
+          setNewUniversity(profileRes.data.university || "");
+          setNewYear(profileRes.data.study_year || "");
         }
         if (resultsRes.data) setResults(resultsRes.data);
-        if (statsRes.data && statsRes.data.length > 0) setStats(statsRes.data[0]);
+        if (statsRes.data?.length > 0) setStats(statsRes.data[0]);
         if (ratingRes.data) setRatingHistory(ratingRes.data);
         if (perfRes.data) setPerformance(perfRes.data);
-        
+
         setLoadingData(false);
       };
       fetchData();
     }
   }, [user]);
 
-  const handleUpdateName = async () => {
+  const handleUpdateProfile = async () => {
     if (!newName.trim()) {
       setUpdateMessage("Name cannot be empty.");
       return;
@@ -86,14 +130,23 @@ export default function ProfilePage() {
 
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: newName })
+      .update({
+        full_name: newName,
+        university: newUniversity,
+        academic_year: newYear,
+      })
       .eq("id", user.id);
 
     if (error) {
-      setUpdateMessage("Error updating name. Try again.");
+      setUpdateMessage("Error updating profile. Try again.");
     } else {
-      setProfile({ ...profile, full_name: newName });
-      setUpdateMessage("Name updated successfully!");
+      setProfile({
+        ...profile,
+        full_name: newName,
+        university: newUniversity,
+        academic_year: newYear,
+      });
+      setUpdateMessage("Profile updated successfully!");
       setEditing(false);
     }
     setUpdating(false);
@@ -112,54 +165,96 @@ export default function ProfilePage() {
           <h1 className="text-4xl font-extrabold text-gray-800">
             {profile?.full_name ?? user?.email}
           </h1>
-          <p className={`mt-2 text-2xl font-bold ${getRankColor(profile?.rating ?? 0)}`}>
+          <p
+            className={`mt-2 text-2xl font-bold ${
+              getRankColor(profile?.rating ?? 0)
+            }`}
+          >
             Rating: {profile?.rating ?? "N/A"}
+          </p>
+          <p className="mt-2 text-lg text-gray-600">
+            🎓 {profile?.university ?? "Not set"} | {profile?.academic_year ?? "Not set"}
           </p>
           {!editing && (
             <button
               onClick={() => setEditing(true)}
               className="mt-3 text-blue-600 hover:underline"
             >
-              Change your name
+              Edit Profile
             </button>
           )}
         </div>
 
-        {/* Edit Username Section */}
+        {/* Edit Profile Section */}
         {editing && (
           <div className="mb-12 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Change Username</h2>
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Edit Profile
+            </h2>
+            <div className="flex flex-col gap-4">
+              {/* Name */}
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter new username"
               />
-              <button
-                onClick={handleUpdateName}
-                disabled={updating}
-                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
+
+              {/* University Dropdown */}
+              <select
+                value={newUniversity}
+                onChange={(e) => setNewUniversity(e.target.value)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {updating ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={() => setEditing(false)}
-                className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                <option value="">Select University</option>
+                {universities.map((uni) => (
+                  <option key={uni} value={uni}>
+                    {uni}
+                  </option>
+                ))}
+              </select>
+
+              {/* Study Year Dropdown */}
+              <select
+                value={newYear}
+                onChange={(e) => setNewYear(e.target.value)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Cancel
-              </button>
+                <option value="">Select Year</option>
+                {studyYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+
+              {/* Buttons */}
+              <div className="flex gap-4">
+                <button
+                  onClick={handleUpdateProfile}
+                  disabled={updating}
+                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105 disabled:opacity-50"
+                >
+                  {updating ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={() => setEditing(false)}
+                  className="px-6 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              {updateMessage && (
+                <p className="mt-3 text-sm text-gray-600">{updateMessage}</p>
+              )}
             </div>
-            {updateMessage && (
-              <p className="mt-3 text-sm text-gray-600">{updateMessage}</p>
-            )}
           </div>
         )}
 
         {/* Stats and Recent Activity Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* Left Column: Stats */}
           <div className="lg:col-span-1 space-y-8">
             {/* 📌 Statistics */}
@@ -211,7 +306,6 @@ export default function ProfilePage() {
 
           {/* Right Column: Performance + Recent Activity */}
           <div className="lg:col-span-2 space-y-8">
-            
             {/* 📚 Performance by Subject */}
             <div className="bg-white rounded-xl shadow-lg p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance by Subject</h2>

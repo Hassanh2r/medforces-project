@@ -1,50 +1,40 @@
 // src/app/articles/page.js
-import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { supabase } from '@/lib/supabaseClient';
+import Link from "next/link";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { supabase } from "@/lib/supabaseClient";
+import ArticlesList from "./ArticlesList"; // ✨ component للبحث + العرض
 
-export const runtime = 'edge';
-
-// إيقاف الكاش → الصفحة SSR دايمًا
+export const runtime = "edge";
 export const revalidate = 0;
 
-// هذه صفحة خادم (Server Component) لجلب البيانات مباشرة من Supabase
 export default async function ArticlesListPage() {
   const { data: articles, error } = await supabase
-    .from('articles')
-    .select('title, slug, created_at')
-    .order('created_at', { ascending: false });
+    .from("articles")
+    .select("title, slug, created_at")
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching articles:', error);
+    console.error("Error fetching articles:", error);
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <main className="flex-grow container mx-auto px-6 py-12">
+        {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-800">Learn</h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Browse our collection of articles and explanations.
+          <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight">
+            📚 Articles & Learning
+          </h1>
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            Explore our curated collection of articles and explanations, crafted
+            to help you learn effectively and stay inspired.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-6">
-          {articles?.map((article) => (
-            <Link
-              href={`/articles/${article.slug}`}
-              key={article.slug}
-              className="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
-            >
-              <h2 className="text-2xl font-bold text-blue-800">{article.title}</h2>
-              <p className="text-sm text-gray-500 mt-2">
-                Published on: {new Date(article.created_at).toLocaleDateString()}
-              </p>
-            </Link>
-          ))}
-        </div>
+        {/* Articles with Search */}
+        <ArticlesList articles={articles || []} />
       </main>
       <Footer />
     </div>
