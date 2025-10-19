@@ -9,6 +9,8 @@ import useAuth from '@/hooks/useAuth';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+export const runtime = "edge";
+
 // مكون مخصص لعرض كل نوع من أنواع المحتوى
 const ContentBlock = ({ block, onAnswer }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
