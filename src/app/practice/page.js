@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';  // 👈 مهم علشان التوجيه
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
@@ -139,7 +139,7 @@ export default function PracticePage() {
     if (!selectedLecture) return;
     setIsLoading(true);
     const { data } = await supabase.from('questions').select('*').eq('lecture_id', selectedLecture.id);
-    const shuffledQuestions = shuffleArray(data || []);
+    const shuffledQuestions = data || [];
     const questionsWithShuffledOptions = shuffledQuestions.map(q => {
       const options = [...q.options];
       const correctAnswerText = options[q.correct_answer_index];
