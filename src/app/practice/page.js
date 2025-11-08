@@ -378,31 +378,86 @@ export default function PracticePage() {
         {quizActive && currentQuestion && (
           <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
             <div className="mb-6">
-              <div className="flex justify-between mb-1">
-                <span className="text-base font-medium text-blue-700">Progress</span>
-                <span className="text-sm font-medium text-blue-700">{currentQuestionIndex + 1} of {questions.length}</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
-              </div>
-            </div>
+
+  {/* أزرار أو أسهم التنقل فوق البار */}
+  <div className="flex justify-between items-center mb-4">
+    <button
+      onClick={() => setCurrentQuestionIndex(prev => Math.max(prev - 1, 0))}
+      disabled={currentQuestionIndex === 0}
+      className={`flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition ${
+        currentQuestionIndex === 0
+          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+      }`}
+    >
+      ← Previous
+    </button>
+
+    <button
+      onClick={() => {
+        if (quizMode === 'exam') {
+          handleNextQuestion(false);
+        } else {
+          handleNextQuestion();
+        }
+      }}
+      disabled={currentQuestionIndex === questions.length - 1}
+      className={`flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition ${
+        currentQuestionIndex === questions.length - 1
+          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          : 'bg-blue-600 text-white hover:bg-blue-700'
+      }`}
+    >
+      Next →
+    </button>
+  </div>
+
+  {/* Progress bar section */}
+  <div className="flex justify-between mb-1">
+    <span className="text-base font-medium text-blue-700">Progress</span>
+    <span className="text-sm font-medium text-blue-700">
+      {currentQuestionIndex + 1} of {questions.length}
+    </span>
+  </div>
+  <div className="w-full bg-gray-200 rounded-full h-2.5">
+    <div
+      className="bg-blue-600 h-2.5 rounded-full"
+      style={{ width: `${progress}%` }}
+    ></div>
+  </div>
+</div>
             <h2 className="text-xl font-semibold mb-6 text-gray-800">{currentQuestion.question_text}</h2>
             <div className="space-y-4">
               {currentQuestion.options.map((option, index) => {
-                const isSelected = selectedAnswer === index;
-                const isCorrect = index === currentQuestion.correct_answer_index;
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(index)}
-                    className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${isSelected ? (isCorrect ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500') : 'bg-white hover:bg-gray-50 border-gray-300'}`}
-                  >
-                    <span className="text-gray-800">{option}</span>
-                  </button>
-                )
-              })}
+  const isSelected = selectedAnswer === index;
+  const isCorrect = index === currentQuestion.correct_answer_index;
+
+  return (
+    <button
+      key={index}
+      onClick={() => {
+        // يمنع التعديل بعد أول اختيار
+        if (selectedAnswer === null) {
+          handleAnswer(index);
+        }
+      }}
+      disabled={selectedAnswer !== null} // يقفل كل الأزرار بعد أول اختيار
+      className={`w-full text-left p-4 rounded-lg border transition-all duration-200 
+        ${isSelected
+          ? (isCorrect
+              ? 'bg-green-100 border-green-500'
+              : 'bg-red-100 border-red-500')
+          : 'bg-white hover:bg-gray-50 border-gray-300'
+        }
+        ${selectedAnswer !== null && !isSelected ? 'opacity-70 cursor-not-allowed' : ''}
+      `}
+    >
+      <span className="text-gray-800">{option}</span>
+    </button>
+  );
+})}
             </div>
-            {quizMode === 'study' && showFeedback && (
+        {quizMode === 'study' && showFeedback && (
               <div className="mt-6 p-4 rounded-lg border bg-gray-50 text-gray-800">
                 {selectedAnswer === currentQuestion.correct_answer_index ? (
                   <p className="flex items-center gap-2 font-semibold text-green-700"><CheckIcon /> Correct!</p>
