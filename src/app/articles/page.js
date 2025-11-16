@@ -8,11 +8,19 @@ import ArticlesList from "./ArticlesList"; // ✨ component للبحث + الع�
 export const runtime = "edge";
 export const revalidate = 0;
 
-export default async function ArticlesListPage() {
-  const { data: articles, error } = await supabase
+export default async function ArticlesListPage({ searchParams }) {
+  const moduleFilter = searchParams?.module || null;
+
+  let query = supabase
     .from("articles")
-    .select("title, slug, created_at")
+    .select("title, slug, created_at, module")
     .order("created_at", { ascending: false });
+
+  if (moduleFilter) {
+    query = query.eq("module", moduleFilter);
+  }
+
+  const { data: articles, error } = await query;
 
   if (error) {
     console.error("Error fetching articles:", error);
@@ -34,7 +42,10 @@ export default async function ArticlesListPage() {
         </div>
 
         {/* Articles with Search */}
-        <ArticlesList articles={articles || []} />
+        <ArticlesList 
+          articles={articles || []}
+          moduleFilter={moduleFilter}
+        />
       </main>
       <Footer />
     </div>
