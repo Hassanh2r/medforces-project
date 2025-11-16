@@ -3,9 +3,13 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function ArticlesList({ articles }) {
+export default function ArticlesList({ articles, moduleFilter }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
+
+  const modules = ["CNS", "Endocrine", "Reproductive", "CVS", "Renal"];
 
   const filteredArticles = useMemo(() => {
     return articles.filter((a) =>
@@ -13,8 +17,35 @@ export default function ArticlesList({ articles }) {
     );
   }, [articles, search]);
 
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+
+    if (value === "all") {
+      router.push("/articles");
+    } else {
+      router.push(`/articles?module=${value}`);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
+
+      {/* Module Filter */}
+      <div className="mb-6 flex justify-end">
+        <select
+          className="border rounded-xl p-2 text-gray-700 bg-white shadow-sm"
+          onChange={handleFilterChange}
+          defaultValue={moduleFilter || "all"}
+        >
+          <option value="all">All Modules</option>
+          {modules.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Search Bar */}
       <div className="mb-8 flex justify-center">
         <input
